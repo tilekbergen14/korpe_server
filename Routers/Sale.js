@@ -7,8 +7,7 @@ const Item = require("../Models/Item");
 
 router.post("/", authorization, async (req, res) => {
   try {
-    const { client, total } = req.body;
-
+    const { client, total, received } = req.body;
     // Ensure orders array exists and has at least one order
     if (
       client &&
@@ -20,6 +19,7 @@ router.post("/", authorization, async (req, res) => {
       let sale = await Sale.create({
         name: client,
         total: total,
+        received: received,
         sales: [], // Initialize sales array if no sale document found
       });
 

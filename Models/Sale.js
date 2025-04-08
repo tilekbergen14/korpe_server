@@ -10,6 +10,10 @@ const SaleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    received: {
+      type: Number,
+      required: false,
+    },
     sales: [
       {
         item: {
