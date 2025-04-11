@@ -12,7 +12,7 @@ const SaleSchema = new mongoose.Schema(
     },
     received: {
       type: Number,
-      required: false,
+      required: true,
     },
     sales: [
       {

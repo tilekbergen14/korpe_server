@@ -100,4 +100,33 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/debts", async (req, res) => {
+  try {
+    const items = await Sale.find({
+      $expr: { $ne: ["$total", "$received"] }  // Filter: total != received
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "sales.item",
+        select: "name price",
+      })
+      .populate({
+        path: "sales.service",
+        select: "name price",
+      })
+      .populate({
+        path: "sales.material",
+        select: "name price",
+      })
+      .populate({
+        path: "sales.case",
+        select: "name price",
+      });
+
+    res.json(items);
+  } catch (err) {
+    res.status(409).send(err.message);
+  }
+});
+
 module.exports = router;
