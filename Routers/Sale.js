@@ -150,4 +150,38 @@ router.get("/debts", async (req, res) => {
   }
 });
 
+
+router.delete('/', async (req, res) => {
+  try {
+    const { _id } = req.query;
+
+    if (!_id) {
+      return res.status(400).json({
+        message: "Invalid request. Please provide either _id or client name.",
+      });
+    }
+
+    let sale;
+    
+    if (_id) {
+      sale = await Sale.findByIdAndDelete(_id); 
+    } 
+
+    if (!sale) {
+      return res.status(404).json({
+        message: "Sale not found.",
+      });
+    }
+
+    return res.json({
+      message: "Sale deleted successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "An error occurred while deleting the sale.",
+    });
+  }
+});
+
 module.exports = router;
