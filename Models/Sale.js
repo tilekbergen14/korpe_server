@@ -14,6 +14,10 @@ const SaleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    last_received: {
+      type: Number,
+      // required: true,
+    },
     sales: [
       {
         item: {

@@ -73,6 +73,27 @@ router.post("/", authorization, async (req, res) => {
   }
 });
 
+
+router.post("/received", authorization, async (req, res) => {
+  try {
+    const { _id } = req.body;
+      let sale = await Sale.findOne({ _id });
+      if (sale) {
+        sale.last_received = sale.total - sale.received;
+        sale.received = sale.total;
+        await sale.save();
+  
+        return res.json({ message: "Sale updated successfully", sale });
+      }
+      return res.json({ message: "Couldn't update!", sale });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+});
+
+
+
 router.get("/", async (req, res) => {
   try {
     const items = await Sale.find({})
