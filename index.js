@@ -22,6 +22,7 @@ app.use("/service", require("./Routers/Service"));
 app.use("/material", require("./Routers/Material"));
 app.use("/case", require("./Routers/Case"));
 app.use("/sale", require("./Routers/Sale"));
+app.use("/pillow", require("./Routers/Pillow"));
 
 app.listen(
   5000,
