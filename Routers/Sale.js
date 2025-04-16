@@ -7,7 +7,7 @@ const Item = require("../Models/Item");
 
 router.post("/", authorization, async (req, res) => {
   try {
-    const { client, total, received } = req.body;
+    const { client, total, received, readyOrder } = req.body;
     // Ensure orders array exists and has at least one order
     if (
       client &&
@@ -21,6 +21,7 @@ router.post("/", authorization, async (req, res) => {
         total: total,
         received: received,
         sales: [], // Initialize sales array if no sale document found
+        readyOrder,
       });
 
       // Loop through orders and add them to the sales array
@@ -30,6 +31,7 @@ router.post("/", authorization, async (req, res) => {
           service: order.service?._id,
           material: order.material?._id,
           case: order.case?._id,
+          pillow: order.pillow?._id,
           weight: order.weight,
           length: order.lenght,
           quantity: order.quantity,
@@ -73,26 +75,23 @@ router.post("/", authorization, async (req, res) => {
   }
 });
 
-
 router.post("/received", authorization, async (req, res) => {
   try {
     const { _id } = req.body;
-      let sale = await Sale.findOne({ _id });
-      if (sale) {
-        sale.last_received = sale.total - sale.received;
-        sale.received = sale.total;
-        await sale.save();
-  
-        return res.json({ message: "Sale updated successfully", sale });
-      }
-      return res.json({ message: "Couldn't update!", sale });
+    let sale = await Sale.findOne({ _id });
+    if (sale) {
+      sale.last_received = sale.total - sale.received;
+      sale.received = sale.total;
+      await sale.save();
+
+      return res.json({ message: "Sale updated successfully", sale });
+    }
+    return res.json({ message: "Couldn't update!", sale });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Something went wrong!" });
   }
 });
-
-
 
 router.get("/", async (req, res) => {
   try {
@@ -113,8 +112,11 @@ router.get("/", async (req, res) => {
       .populate({
         path: "sales.case",
         select: "name price",
+      })
+      .populate({
+        path: "sales.pillow",
+        select: "name price",
       });
-
     res.json(items);
   } catch (err) {
     res.status(409).send(err.message);
@@ -124,7 +126,7 @@ router.get("/", async (req, res) => {
 router.get("/debts", async (req, res) => {
   try {
     const items = await Sale.find({
-      $expr: { $ne: ["$total", "$received"] }  // Filter: total != received
+      $expr: { $ne: ["$total", "$received"] }, // Filter: total != received
     })
       .sort({ createdAt: -1 })
       .populate({
@@ -150,8 +152,7 @@ router.get("/debts", async (req, res) => {
   }
 });
 
-
-router.delete('/', async (req, res) => {
+router.delete("/", async (req, res) => {
   try {
     const { _id } = req.query;
 
@@ -162,10 +163,10 @@ router.delete('/', async (req, res) => {
     }
 
     let sale;
-    
+
     if (_id) {
-      sale = await Sale.findByIdAndDelete(_id); 
-    } 
+      sale = await Sale.findByIdAndDelete(_id);
+    }
 
     if (!sale) {
       return res.status(404).json({

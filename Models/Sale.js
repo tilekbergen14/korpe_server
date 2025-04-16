@@ -18,6 +18,10 @@ const SaleSchema = new mongoose.Schema(
       type: Number,
       // required: true,
     },
+    readyOrder: {
+      type: Boolean,
+      default: false,
+    },
     sales: [
       {
         item: {
@@ -39,6 +43,11 @@ const SaleSchema = new mongoose.Schema(
           type: mongoose.ObjectId,
           required: false,
           ref: "Case",
+        },
+        pillow: {
+          type: mongoose.ObjectId,
+          required: false,
+          ref: "Pillow",
         },
         weight: {
           type: Number,
